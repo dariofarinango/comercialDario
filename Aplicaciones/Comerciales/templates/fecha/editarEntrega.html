@@ -1,0 +1,143 @@
+{% extends "plantilla.html" %}
+
+{% block contenido %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Fecha de Entrega</title>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        label.error {
+            color: red;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input.error {
+            border: 2px solid red;
+        }
+
+        .btn-submit {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editar Fecha de Entrega</h1>
+        <div class="form-container">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="tienda" class="form-label">Tienda:</label>
+                    <select id="tienda" name="tienda" class="form-control" required>
+                        {% for tienda in tiendas %}
+                            <option value="{{ tienda.id }}" {% if tienda.id == entrega.tienda.id %}selected{% endif %}>
+                                {{ tienda.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha_entrega" class="form-label">Fecha de Entrega:</label>
+                    <input type="datetime-local" id="fecha_entrega" name="fecha_entrega" class="form-control"
+                           value="{{ entrega.fecha_entrega|date:'Y-m-d\TH:i' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="estado_entrega" class="form-label">Estado:</label>
+                    <input type="text" id="estado_entrega" name="estado_entrega" class="form-control"
+                           value="{{ entrega.estado_entrega }}" required>
+                </div>
+
+                <button type="submit" class="btn-submit mt-3">Guardar Cambios</button>
+                <a href="{% url 'listar_entregas' %}" class="btn-secondary mt-3">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Validaciones con jQuery -->
+    <script>
+        $("form").validate({
+            rules: {
+                "tienda": {
+                    required: true
+                },
+                "fecha_entrega": {
+                    required: true,
+                    date: true
+                },
+                "estado_entrega": {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 100
+                }
+            },
+            messages: {
+                "tienda": {
+                    required: "Selecciona una tienda."
+                },
+                "fecha_entrega": {
+                    required: "La fecha de entrega es obligatoria.",
+                    date: "Por favor, introduce una fecha válida."
+                },
+                "estado_entrega": {
+                    required: "El estado es obligatorio.",
+                    minlength: "El estado debe tener al menos 3 caracteres.",
+                    maxlength: "El estado no puede exceder los 100 caracteres."
+                }
+            },
+            errorPlacement: function(error, element) {
+                error.insertAfter(element);
+            },
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

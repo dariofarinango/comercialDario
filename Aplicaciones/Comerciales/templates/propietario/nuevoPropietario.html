@@ -1,0 +1,161 @@
+{% extends "plantilla.html" %}
+{% block contenido %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Propietario</title>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        label.error {
+            color: red;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input.error, select.error {
+            border: 2px solid red;
+        }
+
+        .btn-submit {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Crear Nuevo Propietario</h1>
+        <div class="form-container">
+            <form id="nuevo_propietario" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="foto" class="form-label">Foto:</label>
+                    <input type="file" id="foto" name="foto" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label for="direccion" class="form-label">Dirección:</label>
+                    <input type="text" id="direccion" name="direccion" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="contacto" class="form-label">Contacto:</label>
+                    <input type="text" id="contacto" name="contacto" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tienda" class="form-label">Tienda:</label>
+                    <select id="tienda" name="tienda" class="form-control" required>
+                        {% for tienda in tiendas %}
+                            <option value="{{ tienda.id }}">{{ tienda.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit mt-3">Guardar</button>
+                <a href="{% url 'listar_propietarios' %}" class="btn btn-secondary mt-3">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Validaciones con jQuery -->
+
+    <script>
+        $("#nuevo_propietario").validate({
+            rules: {
+                "nombre": {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 100
+                },
+                "direccion": {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 200
+                },
+                "contacto": {
+                    required: true,
+                    minlength: 10,
+                    maxlength: 50
+                },
+                "tienda": {
+                    required: true
+                }
+            },
+            messages: {
+                "nombre": {
+                    required: "El nombre es obligatorio.",
+                    minlength: "El nombre debe tener al menos 3 caracteres.",
+                    maxlength: "El nombre no puede exceder los 100 caracteres."
+                },
+                "direccion": {
+                    required: "La dirección es obligatoria.",
+                    minlength: "La dirección debe tener al menos 5 caracteres.",
+                    maxlength: "La dirección no puede exceder los 200 caracteres."
+                },
+                "contacto": {
+                    required: "El contacto es obligatorio.",
+                    minlength: "El contacto debe tener al menos 10 caracteres.",
+                    maxlength: "El contacto no puede exceder los 50 caracteres."
+                },
+                "tienda": {
+                    required: "La tienda es obligatoria."
+                }
+            },
+            errorPlacement: function(error, element) {
+                error.insertAfter(element);
+            },
+        });
+        
+    </script>
+    <script>
+        $("#foto").fileinput({
+            
+            allowedFileExtensions: ["png|jpg|jpeg"],
+            showCaption: false,
+            dropZoneEnabled: true,
+            showClose: true,
+        })
+    </script>
+    
+    
+</body>
+</html>
+
+{% endblock %}

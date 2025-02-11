@@ -1,0 +1,194 @@
+{% extends "plantilla.html" %}
+{% block contenido %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Edificación</title>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        label.error {
+            color: red;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input.error {
+            border: 2px solid red;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editar Edificación</h1>
+        <div class="form-container">
+            <form id="editar_edificacion" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ edificacion.nombre }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" class="form-control" required>{{ edificacion.descripcion }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ edificacion.fecha_inicio|date:'Y-m-d' }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha_estimada" class="form-label">Fecha Estimada de Finalización:</label>
+                    <input type="date" id="fecha_estimada" name="fecha_estimada" value="{{ edificacion.fecha_estimada|date:'Y-m-d' }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado:</label>
+                    <select id="estado" name="estado" class="form-control" required>
+                        <option value="En Progreso" {% if edificacion.estado == "En Progreso" %}selected{% endif %}>En Progreso</option>
+                        <option value="Completado" {% if edificacion.estado == "Completado" %}selected{% endif %}>Completado</option>
+                        <option value="Pendiente" {% if edificacion.estado == "Pendiente" %}selected{% endif %}>Pendiente</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="presupuesto" class="form-label">Presupuesto:</label>
+                    <input type="number" id="presupuesto" name="presupuesto" value="{{ edificacion.presupuesto }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="foto_actual">Foto Actual:</label><br>
+                    {% if edificacion.foto and edificacion.foto.url %}
+                        <a href="{{ edificacion.foto.url }}" target="_blank">
+                            <img src="{{ edificacion.foto.url }}" alt="Foto de {{ edificacion.nombre }}" height="100px" width="100px">
+                        </a><br>
+                        <a download href="{{ edificacion.foto.url }}">Descargar Foto</a>
+                    {% else %}
+                        <p>No hay foto disponible.</p>
+                    {% endif %}
+                    
+                    <label for="foto">Subir Nueva Foto:</label>
+                    <input type="file" id="foto" name="foto">
+                </div>
+
+                <button type="submit" class="btn-submit mt-3">Guardar Cambios</button>
+            </form>
+            <a href="{% url 'listar_edificaciones' %}" class="btn btn-secondary mt-3">Volver al Listado</a>
+        </div>
+    </div>
+
+    <!-- Validaciones con jQuery -->
+    <script>
+        $("#editar_edificacion").validate({
+            rules: {
+                "nombre": {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 100
+                },
+                "descripcion": {
+                    required: true,
+                    minlength: 10,
+                    maxlength: 500
+                },
+                "fecha_inicio": {
+                    required: true,
+                    date: true
+                },
+                "fecha_estimada": {
+                    required: true,
+                    date: true
+                },
+                "estado": {
+                    required: true
+                },
+                "presupuesto": {
+                    required: true,
+                    number: true,
+                    min: 0
+                }
+            },
+            messages: {
+                "nombre": {
+                    required: "El nombre es obligatorio.",
+                    minlength: "El nombre debe tener al menos 3 caracteres.",
+                    maxlength: "El nombre no puede exceder los 100 caracteres."
+                },
+                "descripcion": {
+                    required: "La descripción es obligatoria.",
+                    minlength: "La descripción debe tener al menos 10 caracteres.",
+                    maxlength: "La descripción no puede exceder los 500 caracteres."
+                },
+                "fecha_inicio": {
+                    required: "La fecha de inicio es obligatoria.",
+                    date: "Por favor, introduce una fecha válida."
+                },
+                "fecha_estimada": {
+                    required: "La fecha estimada es obligatoria.",
+                    date: "Por favor, introduce una fecha válida."
+                },
+                "estado": {
+                    required: "El estado es obligatorio."
+                },
+                "presupuesto": {
+                    required: "El presupuesto es obligatorio.",
+                    number: "El presupuesto debe ser un número.",
+                    min: "El presupuesto no puede ser negativo."
+                }
+            },
+            errorPlacement: function(error, element) {
+                error.insertAfter(element);
+            },
+
+        });
+    </script>
+    <script>
+        $("#foto").fileinput({
+            
+            allowedFileExtensions: ["png|jpg|jpeg"],
+            showCaption: false,
+            dropZoneEnabled: true,
+            showClose: true,
+        })
+    </script>
+</body>
+</html>
+
+{% endblock %}

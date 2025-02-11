@@ -1,0 +1,184 @@
+{% extends "plantilla.html" %}
+
+{% block contenido %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Recurso</title>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        label.error {
+            color: red;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input.error {
+            border: 2px solid red;
+        }
+
+        .btn-submit {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nuevo Recurso</h1>
+        <div class="form-container">
+            <form id="nuevo_recurso" method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="id_edificacion" class="form-label">Edificación:</label>
+                    <select id="id_edificacion" name="id_edificacion" class="form-control" required>
+                        {% for edificacion in edificaciones %}
+                            <option value="{{ edificacion.id }}">{{ edificacion.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tipo_recurso" class="form-label">Tipo de Recurso:</label>
+                    <select id="tipo_recurso" name="tipo_recurso" class="form-control" required>
+                        <option value="humano">Humano</option>
+                        <option value="material">Material</option>
+                        <option value="financiero">Financiero</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción:</label>
+                    <input type="text" id="descripcion" name="descripcion" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="cantidad" class="form-label">Cantidad:</label>
+                    <input type="number" id="cantidad" name="cantidad" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="costo" class="form-label">Costo:</label>
+                    <input type="number" id="costo" name="costo" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha_asignacion" class="form-label">Fecha de Asignación:</label>
+                    <input type="datetime-local" id="fecha_asignacion" name="fecha_asignacion" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn-submit mt-3">Guardar</button>
+                <a href="{% url 'listar_recursos' %}" class="btn-secondary mt-3">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Validaciones con jQuery -->
+    <script>
+        $("#nuevo_recurso").validate({
+            rules: {
+                "id_edificacion": {
+                    required: true
+                },
+                "tipo_recurso": {
+                    required: true
+                },
+                "descripcion": {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 255
+                },
+                "cantidad": {
+                    required: true,
+                    number: true,
+                    min: 1
+                },
+                "costo": {
+                    required: true,
+                    number: true,
+                    min: 0
+                },
+                "fecha_asignacion": {
+                    required: true,
+                    date: true
+                }
+            },
+            messages: {
+                "id_edificacion": {
+                    required: "Selecciona una edificación."
+                },
+                "tipo_recurso": {
+                    required: "Selecciona el tipo de recurso."
+                },
+                "descripcion": {
+                    required: "La descripción es obligatoria.",
+                    minlength: "La descripción debe tener al menos 3 caracteres.",
+                    maxlength: "La descripción no puede exceder los 255 caracteres."
+                },
+                "cantidad": {
+                    required: "La cantidad es obligatoria.",
+                    number: "La cantidad debe ser un número.",
+                    min: "La cantidad debe ser al menos 1."
+                },
+                "costo": {
+                    required: "El costo es obligatorio.",
+                    number: "El costo debe ser un número.",
+                    min: "El costo no puede ser negativo."
+                },
+                "fecha_asignacion": {
+                    required: "La fecha de asignación es obligatoria.",
+                    date: "Por favor, introduce una fecha válida."
+                }
+            },
+            errorPlacement: function(error, element) {
+                error.insertAfter(element);
+            },
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}
